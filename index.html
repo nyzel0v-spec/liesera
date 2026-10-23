@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iPhone Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; user-select: none; }
+        body { background: #0a0a0a; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #fff; overflow: hidden; }
+        
+        /* Container iPhone */
+        .iphone { 
+            width: 393px; 
+            height: 852px; 
+            border-radius: 50px; 
+            position: relative; 
+            overflow: hidden; 
+            background: url('https://i.ibb.co/3mN9R5w/3532ef57e837e1ccdbc771c422d696f8.jpg') center/cover no-repeat; 
+            border: 12px solid #2d2d2d; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transition: background 0.3s ease;
+        }
+
+        /* Status Bar Top */
+        .status-bar { position: absolute; top: 12px; width: 100%; padding: 0 28px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; z-index: 101; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .status-icons { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+
+        /* Dynamic Island */
+        .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 120px; height: 35px; background: #000; border-radius: 20px; z-index: 102; transition: all 0.3s ease; }
+
+        /* General Screen Layout */
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; padding: 60px 20px 20px; }
+        .screen.active { display: flex; }
+
+        /* Lock Screen Elements */
+        .lock-date { font-size: 18px; font-weight: 600; text-align: center; margin-top: 15px; opacity: 0.9; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+        .lock-time { font-size: 82px; font-weight: 700; text-align: center; line-height: 1; margin-top: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+        
+        .notif { background: rgba(30, 30, 30, 0.65); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 20px; padding: 14px; margin-top: 25px; border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.6s ease; cursor: pointer; }
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .lock-bottom { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 10px 20px; }
+        .quick-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid rgba(255,255,255,0.1); }
+        .unlock-hint { text-align: center; font-size: 13px; opacity: 0.8; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+        /* Home Screen Apps Grid */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: auto; padding-bottom: 20px; }
+        .app-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+        .app { width: 62px; height: 62px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+
+        /* Widget Layout */
+        .widget { background: rgba(255, 255, 255, 0.85); color: #000; padding: 16px; border-radius: 22px; margin-top: 20px; backdrop-filter: blur(10px); }
+
+        /* Bar Navigasi Bawah */
+        .home-bar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 135px; height: 5px; background: #fff; border-radius: 10px; cursor: pointer; z-index: 105; }
+    </style>
+</head>
+<body>
+
+    <div class="iphone" id="iphone-device">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span id="status-clock">00:00</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Dynamic Island -->
+        <div class="island"></div>
+        
+        <!-- 1. Lock Screen -->
+        <div class="screen active" id="lock" onclick="unlockPhone(event)">
+            <div class="lock-date" id="lock-date">Hari, 00 Bulan</div>
+            <div class="lock-time" id="lock-time">00:00</div>
+            
+            <div class="notif" onclick="show('wa')">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <span style="font-size:12px; color:#25D366; font-weight:700;"><i class="fa-brands fa-whatsapp"></i> WHATSAPP</span>
+                    <span style="font-size:10px; opacity:0.6;">Baru saja</span>
+                </div>
+                <b style="font-size:14px;">Reinar Attala</b>
+                <p style="font-size:13px; opacity:0.85; margin-top:2px;">Lagi apa? Aku nungguin nih 😄</p>
+            </div>
+
+            <div class="lock-bottom">
+                <div class="quick-btn"><i class="fa-solid fa-flashlight"></i></div>
+                <div class="unlock-hint">Klik untuk membuka</div>
+                <div class="quick-btn"><i class="fa-solid fa-camera"></i></div>
+            </div>
+        </div>
+
+        <!-- 2. Home Screen -->
+        <div class="screen" id="home">
+            <div class="widget">
+                <b style="color:#e11d48; font-size:12px; text-transform:uppercase;" id="widget-day">JUMAT</b>
+                <div style="font-size:22px; font-weight:700; margin-top:2px;" id="widget-date">23 Oktober</div>
+                <p style="font-size:12px; color:#444; margin-top:6px;">Anter sayangku beli make up 10.00</p>
+            </div>
+
+            <div class="grid">
+                <div class="app-item" onclick="show('wa')">
+                    <div class="app" style="background:#25D366;"><i class="fa-brands fa-whatsapp"></i></div>
+                    <span class="app-name">WhatsApp</span>
+                </div>
+                <div class="app-item" onclick="changeWallpaper()">
+                    <div class="app" style="background:#6366f1;"><i class="fa-solid fa-gear"></i></div>
+                    <span class="app-name">Ganti BG</span>
+                </div>
+                <div class="app-item" onclick="alert('Galeri Foto AU')">
+                    <div class="app" style="background:#ea580c;"><i class="fa-regular fa-image"></i></div>
+                    <span class="app-name">Foto</span>
+                </div>
+                <div class="app-item" onclick="alert('Instagram AU')">
+                    <div class="app" style="background:linear-gradient(45deg, #f09433, #bc1888);"><i class="fa-brands fa-instagram"></i></div>
+                    <span class="app-name">Instagram</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. WhatsApp Screen -->
+        <div class="screen" id="wa" style="background:#0b141a;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; border-bottom:1px solid #222; padding-bottom:10px;">
+                <i class="fa-solid fa-chevron-left" onclick="show('home')" style="cursor:pointer; padding:5px;"></i>
+                <div>
+                    <h4 style="font-size:16px;">Reinar Attala</h4>
+                    <p style="font-size:11px; color:#25D366;">Online</p>
+                </div>
+            </div>
+            <div style="background:#202c33; padding:12px; border-radius:12px; max-width:80%; align-self:flex-start;">
+                <p style="font-size:13px;">Lagi apa? Saya bosen nih</p>
+                <span style="font-size:9px; opacity:0.5; float:right; margin-top:4px;">11:28</span>
+            </div>
+        </div>
+
+        <!-- Home Bar (Garis Bawah) -->
+        <div class="home-bar" onclick="show('home')"></div>
+    </div>
+
+    <script>
+        // Fungsi Pindah Tampilan Layar
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function unlockPhone(e) {
+            if(!e.target.closest('.notif')) {
+                show('home');
+            }
+        }
+
+        // Fungsi Ganti Wallpaper Secara Langsung
+        function changeWallpaper() {
+            let newUrl = prompt("Masukkan Link/URL Gambar Wallpaper Baru:", "https://i.ibb.co/3mN9R5w/3532ef57e837e1ccdbc771c422d696f8.jpg");
+            if(newUrl && newUrl.trim() !== "") {
+                document.getElementById('iphone-device').style.backgroundImage = "url('" + newUrl + "')";
+            }
+        }
+
+        // Fungsi Memperbarui Waktu & Tanggal Realtime (Sesuai Waktu Asli)
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}`;
+
+            // Set Jam Top Status Bar & Lock Screen
+            document.getElementById('status-clock').innerText = timeString;
+            document.getElementById('lock-time').innerText = timeString;
+
+            // Format Tanggal Bahasa Indonesia
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            const dayName = days[now.getDay()];
+            const dayNum = now.getDate();
+            const monthName = months[now.getMonth()];
+
+            document.getElementById('lock-date').innerText = `${dayName}, ${dayNum} ${monthName}`;
+            document.getElementById('widget-day').innerText = dayName.toUpperCase();
+            document.getElementById('widget-date').innerText = `${dayNum} ${monthName}`;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>
